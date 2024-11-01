@@ -1,0 +1,6 @@
+id,name,batch_id,semester,no_of_questions,last_date,teacher_id
+1,Math Quiz,1,2023,10,2023-12-01,1
+2,Science Quiz,2,2023,10,2023-12-02,2
+3,History Quiz,3,2023,10,2023-12-03,3
+4,Geography Quiz,1,2023,10,2023-12-04,4
+5,English Quiz,2,2023,10,2023-12-05,5
