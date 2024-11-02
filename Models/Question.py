@@ -10,13 +10,12 @@ class Question:
     def __init__(self, statement=None, type=None, options=None, marks=None, question_id=None, answer=None):
         self.question = statement
         self.type = type
-        self.options = options
+        self.options = eval(options)
         self.marks = marks
         self.question_id = question_id
         self.answer = answer
-
     def __str__(self):
-        return f"{self.question} {self.answer}"
+        return f"Question ID: {self.question_id}\nQuestion: {self.question}\nType: {self.type}\nOptions: {self.options}\nMarks: {self.marks}\nAnswer: {self.answer}"
     
     def to_sql(self):
         SQL_PASSWORD = os.getenv('SQL_PASSWORD')
@@ -30,16 +29,17 @@ class Question:
         cursor.execute(f"INSERT INTO questions (question_id, question, type, options, marks, answer) VALUES ('{self.question_id}','{self.question}', '{self.type}', '{self.options}', {self.marks}, '{self.answer}')")
         cursor.close()
         conn.close()
+    @staticmethod  
     def from_sql(question_id):
         SQL_PASSWORD = os.getenv('SQL_PASSWORD')
         conn = msc.connect(
             host="localhost",
             user="root",
             password=SQL_PASSWORD,
-            database="quiz"
+            database="quiz_system"
         )
         cursor = conn.cursor()
-        cursor.execute(f"SELECT question, type, options, marks, answer FROM questions WHERE question_id = '{question_id}'")
+        cursor.execute(f"SELECT question, type, options, marks, correct_answer FROM question WHERE id = '{question_id}'")
         question = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -79,3 +79,4 @@ class Question:
         This function will load all responses and create a pie chart of the responses denoting the percentage of each response and those who did not respond.
         """
         pass
+

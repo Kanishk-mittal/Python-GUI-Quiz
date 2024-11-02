@@ -1,51 +1,11 @@
-"""
-This file contains the Quiz class which is used to store the details of a quiz
-and perform operations on it.
-Attributes:
-    1. made_by (Teacher): The teacher who created the quiz.
-    2. assigned_to_batch (str): The batch to which the quiz is assigned.
-    3. assigend_to_semester (str): The semester to which the quiz is assigned.
-    4. no_of_questions (int): The number of questions in the quiz.
-    5. Total_marks (int): The total marks of the quiz.
-    6. questions (list): A list of Question objects.
-    7. last_date (datetime): The last date and time to submit the quiz.
-    8. number_of_attempts (int): The number of attempts allowed for the quiz.
-    9. quiz_id (str): The unique id of the quiz.
-    10. name (str): The name of the quiz.
-Methods:
-    1. constructor(made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id):
-        Initializes the Quiz object with the given parameters.
-    2. to_sql():
-        Saves the quiz details to the database.
-    3. from_sql(quiz_id):
-        Retrieves the quiz details from the database.
-    4. update():
-        Updates the quiz details in the database.
-    5. delete():
-        Deletes the quiz from the database.
-    6. add_question(question):
-        Adds a question to the quiz.
-    7. remove_question(question_id):
-        Removes a question from the quiz.
-    8. percent_attempted():
-        Returns the percentage of students who have attempted the quiz.
-    9. get_all_responses():
-        Returns the responses of all students for the quiz.
-    10. get_response(student_id):
-        Returns the response of a student for the quiz.
-    11. get_report():
-        Returns the report of the quiz.
-    12. get_individual_report(student_id):
-        Returns the report of a student for the quiz.
-    13. attempts_left(student_id):
-        Returns the number of attempts left for a student.
-    
-"""
 import dotenv
 import os
 from .Teacher import Teacher
 from .Question import Question
 import mysql.connector as msc
+import csv
+from datetime import datetime
+from .Question import Question
 
 class Quiz:
     def __init__(self, made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id, name):
@@ -53,45 +13,92 @@ class Quiz:
         self.assigned_to_batch = assigned_to_batch
         self.assigned_to_semester = assigned_to_semester
         self.no_of_questions = no_of_questions
-        self.total_marks = total_marks
-        self.questions = questions
         self.last_date = last_date
         self.number_of_attempts = number_of_attempts
         self.quiz_id = quiz_id
-        self.name = name    
-
-    def to_sql(self):
-        pass
-
-    def from_sql(self, quiz_id):
-        pass
-
-    def update(self):
-        pass
-
-    def delete(self):
-        pass
-
-    def add_question(self, question):
-        pass
-
-    def remove_question(self, question_id):
-        pass
-
-    def percent_attempted(self):
-        pass
-
-    def get_all_responses(self):
-        pass
-
-    def get_response(self, student_id):
-        pass
-
-    def get_report(self):
-        pass
-
-    def get_individual_report(self, student_id):
-        pass
-    
+        self.name = name 
+        self.questions = self.load_questions()
+        self.total_marks = self.calculate_total_marks()
+    def load_questions(self):
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost', user='root', password=SQL_PASSWORD, database='quiz_system')
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT id FROM question WHERE quiz_id = {self.quiz_id}")
+        question_ids = cursor.fetchall()
+        questions = []
+        for question_id in question_ids:
+            question = Question.from_sql(question_id[0])
+            questions.append(question)
+        cursor.close()
+        conn.close()
+        return questions
+    def calculate_total_marks(self):
+        total_marks = 0
+        for question in self.questions:
+            total_marks += question.marks
+        return total_marks
     def attempts_left(self, student_id):
-        return self.number_of_attempts
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost', user='root', password=SQL_PASSWORD, database='quiz_system')
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM attempt WHERE student_roll_no = '{student_id}' AND quiz_id = {self.quiz_id}")
+        attempts = cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return self.number_of_attempts - attempts
+    @staticmethod
+    def get_quizzes(batch,semester):
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost', user='root', password=SQL_PASSWORD, database='quiz_system')
+        cursor = conn.cursor()
+
+        # Load quiz ids for the specified batch and semester
+        cursor.execute(f"""
+            SELECT id
+            FROM quiz
+            WHERE batch_id = '{batch}' AND semester = '{semester}'
+        """)
+        quiz_ids = cursor.fetchall()
+
+        quizzes = []
+        for quiz_id in quiz_ids:
+            quiz = Quiz.from_sql(quiz_id[0])
+            if quiz:
+                quizzes.append(quiz)
+        cursor.close()
+        conn.close()
+
+        return quizzes
+
+    @staticmethod
+    def from_sql(quiz_id):
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost', user='root', password=SQL_PASSWORD, database='quiz_system')
+        cursor = conn.cursor(dictionary=True)
+
+        # Load quiz and teacher data using join
+        cursor.execute(f"""
+            SELECT q.*, t.name as teacher_name, t.username as teacher_username, t.password as teacher_password
+            FROM quiz q
+            JOIN teacher t ON q.teacher_id = t.id
+            WHERE q.id = {quiz_id}
+        """)
+        quiz_data = cursor.fetchone()
+        if not quiz_data:
+            return None
+
+        made_by = quiz_data['teacher_name']
+        assigned_to_batch = quiz_data['batch_id']
+        assigned_to_semester = quiz_data['semester']
+        no_of_questions = int(quiz_data['no_of_questions'])
+        total_marks = None  # This will be calculated
+        questions = []  # This should be loaded from another source
+        last_date = datetime.strptime(quiz_data['last_date'], '%Y-%m-%d')
+        number_of_attempts = int(quiz_data['attempts_allowed'])
+        name = quiz_data['name']
+
+        cursor.close()
+        conn.close()
+
+        return Quiz(made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id, name)
+

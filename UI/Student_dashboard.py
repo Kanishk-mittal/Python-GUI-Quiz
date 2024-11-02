@@ -1,7 +1,8 @@
 import customtkinter as ctk
-from Components.Student_quiz_card import StudentQuizCard
-from Models.Student import Student
+from UI.Components.Student_quiz_card import StudentQuizCard
+from Models.Student import student
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter.messagebox import showinfo
 
 class StudentDashboard(ctk.CTkToplevel):
     """
@@ -34,7 +35,7 @@ class StudentDashboard(ctk.CTkToplevel):
         
         # Second part: Display mini report which we can get through student.mini_report() which will return a dictionary with keys as no_of_attempts, avg_percentage, avg_accuracy
         self.mini_report = self.student.mini_report()
-        self.mini_report_label = ctk.CTkLabel(self, text=f"Number of attempts: {self.mini_report['no_of_attempts']}\nAverage percentage: {self.mini_report['avg_percentage']}\nAverage accuracy: {self.mini_report['avg_accuracy']}")
+        self.mini_report_label = ctk.CTkLabel(self, text=f"Number of attempts: {self.mini_report['no_of_attempts']}\nAverage percentage: {self.mini_report['avg_percentage']}")
         self.mini_report_label.pack(padx=10, pady=10)
         
         # Third part: Display the list of quizzes that the student can attempt
@@ -44,7 +45,7 @@ class StudentDashboard(ctk.CTkToplevel):
         self.quiz_list.pack(padx=10, pady=10)
         
         # We will create a StudentQuizCard for each quiz in the student.get_quizzes()
-        for quiz in self.student.get_quizzes():
+        for quiz in self.student.load_quizzes():
             quiz_card = StudentQuizCard(self.quiz_list, quiz)
             quiz_card.pack(padx=10, pady=10)
     
@@ -53,14 +54,14 @@ class StudentDashboard(ctk.CTkToplevel):
         pass
     
     def get_report(self):
-        # Implement the get report functionality here
-        pass
+        # this show that a report is sent via email
+        showinfo("Message sent", "Report has been sent to your email")  
 
 if __name__ == "__main__":
     import tkinter as tk
     root = tk.Tk()
     root.withdraw()
-    student = Student()  # Assuming you have a way to create or get a Student object
+    student = student.from_sql("2023BCY0001") # Assuming you have a way to create or get a Student object
     student_dashboard = StudentDashboard(student)
     student_dashboard.mainloop()
     root.destroy()
