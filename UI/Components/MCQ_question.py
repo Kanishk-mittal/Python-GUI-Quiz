@@ -11,35 +11,26 @@ class McqQuestion(ctk.CTkFrame):
         get_answer():
             Method for getting the selected answer i.e it will return the value of the selected option.
     """
-    def __init__(self, master=None, question=None, options=None):
+    def __init__(self, master=None, question=None):
         super().__init__(master)
         self.question = question
-        self.options = options
         self.create_widgets()
         
     def create_widgets(self):
         # First part: Question
-        self.question_label = ctk.CTkLabel(self, text=self.question)
-        self.question_label.grid(row=0, column=0, padx=10, pady=10)
+        self.question_label = ctk.CTkLabel(self, text=self.question.question)
+        self.question_label.pack(pady=10,expand=True, fill="both")
         
         # Second part: Options
         self.options_frame = ctk.CTkFrame(self)
-        self.options_frame.grid(row=1, column=0, padx=10, pady=10)
+        self.options_frame.pack(pady=10,expand=True, fill="both",side="left")
         
-        self.selected_option = ctk.IntVar()
-        
-        for index, option in enumerate(self.options):
-            option_radio = ctk.CTkRadioButton(self.options_frame, text=option, variable=self.selected_option, value=index)
-            option_radio.grid(row=index, column=0, padx=5, pady=5)
+        self.selected_option = ctk.StringVar()
+        i=0
+        for key,value in self.question.options.items():
+            option_radio = ctk.CTkRadioButton(self.options_frame, text=value, variable=self.selected_option, value=key)
+            option_radio.pack(pady=10)
+            i+=1
     
     def get_answer(self):
-        return self.options[self.selected_option.get()]
-
-if __name__ == '__main__':
-    question = "What is the capital of India?"
-    options = ["New Delhi", "Mumbai", "Kolkata", "Chennai"]
-    root=ctk.CTk()
-    mcq = McqQuestion(root, question, options)
-    mcq.pack(padx=10, pady=10)
-    ctk.CTkButton(root, text="Get Answer", command=lambda: print(mcq.get_answer())).pack(padx=10, pady=10)
-    root.mainloop()
+        return self.question.options[self.selected_option.get()]
