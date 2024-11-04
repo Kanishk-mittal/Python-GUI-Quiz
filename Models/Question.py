@@ -36,7 +36,7 @@ class Question:
     pie():
         Generates a pie chart of the responses to the question.
     """
-    def __init__(self, statement=None, typ=None, options=None, marks=None, question_id=None, answer=None):
+    def __init__(self,quiz_id,statement=None, typ=None, options=None, marks=None, question_id=None, answer=None):
         """
         Initializes a new instance of the Question class.
 
@@ -50,10 +50,14 @@ class Question:
         """
         self.question = statement
         self.type = typ
-        self.options = eval(options)
+        if type(options) == str:
+            self.options = eval(options)
+        else:
+            self.options = options
         self.marks = marks
         self.question_id = question_id
         self.answer = answer
+        self.quiz_id = quiz_id
     def __str__(self):
         return f"Question ID: {self.question_id}\nQuestion: {self.question}\nType: {self.type}\nOptions: {self.options}\nMarks: {self.marks}\nAnswer: {self.answer}"
     

@@ -1,11 +1,10 @@
 import dotenv
 import os
-from .Teacher import Teacher
-from .Question import Question
+from Models.Question import Question
 import mysql.connector as msc
 import csv
 from datetime import datetime
-from .Question import Question
+from Models.Question import Question
 
 class Quiz:
     def __init__(self, made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id, name):
@@ -13,7 +12,6 @@ class Quiz:
         self.assigned_to_batch = assigned_to_batch
         self.assigned_to_semester = assigned_to_semester
         self.no_of_questions = no_of_questions
-        self.last_date = last_date
         self.number_of_attempts = number_of_attempts
         self.quiz_id = quiz_id
         self.name = name 
@@ -101,4 +99,16 @@ class Quiz:
         conn.close()
 
         return Quiz(made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id, name)
-
+    @staticmethod
+    def get_next_id():
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost',
+                            user='root',
+                            password=SQL_PASSWORD,
+                            database='quiz_system')
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM quiz")
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return result[0] + 1 if result[0] else 1
