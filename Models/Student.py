@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 load_dotenv()
 
 class student:
-    def __init__(self, name, roll_no, password):
+    def __init__(self, name, roll_no, password,email):
         self.name = name
         self.roll_no = roll_no
         self.password = password
+        self.email = email
         self.batch = self.get_batch()
         self.semester = self.get_semester()
         self.quizzes_assigned = self.load_quizzes()
@@ -30,7 +31,6 @@ class student:
         responses = []
         for quiz_id in quiz_ids:
             responses+=Attempt.get_attempts(self.roll_no,quiz_id)
-        print(responses)
         return responses
     def get_pie(self):
         """
@@ -49,6 +49,8 @@ class student:
         return a dictionary with keys as no_of_attempts, avg_percentage
         """
         no_of_attempts = len(self.responses)
+        if no_of_attempts == 0:
+            return {'no_of_attempts': 0, 'avg_percentage': 0}
         total_marks = 0
         marks_obtained = 0
         for response in self.responses:
@@ -56,6 +58,22 @@ class student:
             marks_obtained += response.marks_obtained
         avg_percentage = marks_obtained / total_marks * 100
         return {'no_of_attempts': no_of_attempts, 'avg_percentage': avg_percentage}
+    def to_sql(self):
+        """
+        This function will insert the student object into the database.
+        """
+        SQL_PASSWORD = os.getenv('SQL_PASSWORD')
+        conn = msc.connect(
+            host="localhost",
+            user="root",
+            password=SQL_PASSWORD,
+            database="quiz_system"
+        )
+        cursor = conn.cursor()
+        cursor.execute(f"INSERT INTO student (roll_no,name,password,batch_id,semester,email_id) VALUES ('{self.roll_no}','{self.name}','{self.password}','{self.batch}','{self.semester}','{self.email}')")
+        conn.commit()
+        cursor.close()
+        conn.close()
     @staticmethod
     def from_sql(roll_no):
         """
@@ -69,8 +87,26 @@ class student:
             database="quiz_system"
         )
         cursor = conn.cursor()
-        cursor.execute(f"SELECT name, password FROM student WHERE roll_no = '{roll_no}'")
+        cursor.execute(f"SELECT name, password,email_id FROM student WHERE roll_no = '{roll_no}'")
         student_data = cursor.fetchone()
         cursor.close()
         conn.close()
-        return student(student_data[0], roll_no, student_data[1])
+        return student(student_data[0], roll_no, student_data[1],student_data[2])
+    @staticmethod 
+    def verify(username,password):
+        SQL_PASSWORD = os.getenv('SQL_PASSWORD')
+        conn = msc.connect(
+            host="localhost",
+            user="root",
+            password=SQL_PASSWORD,
+            database="quiz_system"
+        )
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT roll_no FROM student WHERE roll_no = '{username}' AND password = '{password}'")
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if result:
+            return student.from_sql(result[0])
+        else:
+            return False

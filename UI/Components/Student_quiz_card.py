@@ -35,9 +35,6 @@ class StudentQuizCard(ctk.CTkFrame):
         self.no_of_questions_label = ctk.CTkLabel(self.details_frame, text=f"Questions: {self.quiz.no_of_questions}")
         self.no_of_questions_label.grid(row=1, column=0, padx=5, pady=5)
 
-        self.last_date_label = ctk.CTkLabel(self.details_frame, text=f"Last Date: {self.quiz.last_date}")
-        self.last_date_label.grid(row=2, column=0, padx=5, pady=5)
-
         # Third part: Buttons
         self.buttons_frame = ctk.CTkFrame(self)
         self.buttons_frame.grid(row=0, column=2, padx=10, pady=10)

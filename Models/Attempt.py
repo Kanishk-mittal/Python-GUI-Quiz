@@ -66,6 +66,8 @@ class Attempt:
         self.answers = eval(answers)
         if marks_obtained is None:
             self.marks_obtained = self.get_score()
+        else:
+            self.marks_obtained = marks_obtained
         self.time_stamp = time_stamp
     def to_sql(self):
         """

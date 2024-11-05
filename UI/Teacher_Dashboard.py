@@ -31,6 +31,10 @@ class TeacherDashboard(ctk.CTkToplevel):
             quiz_card = TeacherQuizCard(master=self._scrollable_frame, quiz=quiz, Teacher=self.Teacher)
             quiz_card.pack(fill="x", padx=10, pady=10,expand=True)
         
+        if len(self.Teacher.quizzes) == 0:
+            self._no_quiz_label = ctk.CTkLabel(self._scrollable_frame, text="You have no quizzes added yet", font=("Helvetica", 12))
+            self._no_quiz_label.pack(pady=10)
+        
         # add a button to add a new quiz
         self._add_button = ctk.CTkButton(self._frame, text="Add Quiz", command=self._add_quiz)
         self._add_button.pack(side="bottom", pady=10)

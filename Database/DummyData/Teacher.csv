@@ -1,6 +1,6 @@
-id,name,username,password
-1,Prof. Smith,smith,password1
-2,Prof. Johnson,johnson,password2
-3,Prof. Williams,williams,password3
-4,Prof. Brown,brown,password4
-5,Prof. Jones,jones,password5
+id,name,username,password,email_id
+1,Prof. Smith,smith,password1,smith@example.com
+2,Prof. Johnson,johnson,password2,johnson@example.com
+3,Prof. Williams,williams,password3,williams@example.com
+4,Prof. Brown,brown,password4,brown@example.com
+5,Prof. Jones,jones,password5,jones@example.com

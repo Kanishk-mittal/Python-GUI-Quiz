@@ -1,6 +1,6 @@
-roll_no,name,password,batch_id,semester
-2023BCY0001,Alice,password1,1,2023
-2023BCY0002,Bob,password2,2,2023
-2023BCY0003,Charlie,password3,3,2023
-2023BCY0004,David,password4,1,2023
-2023BCY0005,Eve,password5,2,2023
+roll_no,name,password,batch_id,semester,email_id
+2023BCY0001,Alice,password1,1,2023,kanishk23bcy3@iiitkottayam.ac.in
+2023BCY0002,Bob,password2,2,2023,bob@gmail.com
+2023BCY0003,Charlie,password3,3,2023,Charlie@gmail.com
+2023BCY0004,David,password4,1,2023,David@gmail.com
+2023BCY0005,Eve,password5,2,2023,Eve@gmail.com

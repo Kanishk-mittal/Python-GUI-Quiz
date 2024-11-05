@@ -56,13 +56,19 @@ class Login(ctk.CTkToplevel):
         self.login = ctk.CTkButton(self, text='Login', command=self.login_action, width=100)
         self.login.pack(pady=20)
 
-        self.register = ctk.CTkButton(self, text='Register', command=self.register, width=100)
+        self.register = ctk.CTkButton(self, text='Register', command=self.register_action, width=100)
         self.register.pack(pady=20)
+    def get_values(self):
+        """
+        Returns the values entered in the username and password fields.
 
-def login_action(self):
-    print('Login')
-def register(self):
-    print('Register')
+        Returns:
+            tuple: A tuple containing the username and password entered by the user.
+        """
+        return self.username.get(), self.password.get()
+    def clear(self):
+        self.username.setvar("")
+        self.password.setvar("")
 if __name__ == '__main__':
     root = ctk.CTk()
     root.iconify()
