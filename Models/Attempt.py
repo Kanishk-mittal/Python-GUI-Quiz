@@ -222,8 +222,6 @@ class Attempt:
         correct = 0
         incorrect = 0
         unanswered = 0
-        print(self.answers)
-        print(questions)
 
         for question_id, answer in self.answers.items():
             if answer == questions[question_id]:

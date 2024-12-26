@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from Models.Quiz import Quiz
 from Models.Teacher import Teacher
+from tkinter.messagebox import askokcancel
 
 class TeacherQuizCard(ctk.CTkFrame):
     """
@@ -51,7 +52,9 @@ class TeacherQuizCard(ctk.CTkFrame):
         self.attempt_button.pack(side="left", padx=5, pady=5)
 
     def remove_quiz(self):
-        print("Remove quiz")
+        if askokcancel("Remove quiz", "Are you sure you want to remove this quiz?"):
+            self.Teacher.remove_quiz(self.quiz)
+            self.destroy()
 
     def rename(self):
         print("Rename quiz")

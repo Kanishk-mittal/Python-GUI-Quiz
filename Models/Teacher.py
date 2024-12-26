@@ -35,9 +35,8 @@ class Teacher:
             user="root",
             password=os.getenv("SQL_PASSWORD"),
             database="quiz_system")
-        cursor = connection.cursor()
+        cursor = connection.cursor(buffered=True)
         cursor.execute(f"SELECT id FROM quiz WHERE teacher_id = {self.id}")
-        print(f"SELECT id FROM quiz WHERE teacher_id = {self.id}")
         result = cursor.fetchall()
         quizzes = []
         for row in result:
@@ -52,12 +51,18 @@ class Teacher:
             password=os.getenv("SQL_PASSWORD"),
             database="quiz_system")
         cursor = connection.cursor()
-        cursor.execute(f"SELECT * FROM teacher WHERE username = '{username}'")
+        cursor.execute(f"SELECT id,name,username,password,email_id FROM teacher WHERE username = '{username}'")
         result = cursor.fetchone()
         cursor.close()
         connection.close()
         if result:
-            return Teacher(result[1], result[2], result[3],result[4], result[0])
+            return Teacher(
+                id=result[0],
+                name=result[1],
+                username=result[2],
+                password=result[3],
+                email=result[4]
+            )
     def to_sql(self):
         connection = msc.connect(
             host="localhost",
@@ -69,6 +74,26 @@ class Teacher:
         connection.commit()
         cursor.close()
         connection.close()
+    def remove_quiz(self, quiz):
+        connection = msc.connect(
+            host="localhost",
+            user="root",
+            password=os.getenv("SQL_PASSWORD"),
+            database="quiz_system")
+        cursor = connection.cursor()
+        cursor.execute(f"DELETE FROM quiz WHERE id = {quiz.quiz_id}")
+        connection.commit()
+        cursor.close()
+        connection.close()
+    def update(self):
+        # This funtion updates the object from the database
+        connection = msc.connect(
+            host="localhost",
+            user="root",
+            password=os.getenv("SQL_PASSWORD"),
+            database="quiz_system")
+        cursor = connection.cursor()
+
     @staticmethod
     def verify(username,password):
         SQL_PASSWORD = os.getenv('SQL_PASSWORD')

@@ -49,7 +49,6 @@ class AddMCqQuestion(ctk.CTkFrame):
             options[chr(96 + self.options.index(option) + 1)] = option.get()
         
         q= Question(statement=self.question_text.get("1.0", "end-1c"), options=options, answer=self.correct_option_input.get(), quiz_id=self.quiz_id, marks=self.marks_input.get(),typ="MCQ")
-        print(q)
         return q
     
 if __name__ == "__main__":

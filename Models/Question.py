@@ -76,10 +76,16 @@ class Question:
             host="localhost",
             user="root",
             password=SQL_PASSWORD,
-            database="quiz"
+            database="quiz_system"
         )
+        if self.question_id is None:
+            self.question_id = Question.get_next_id()
         cursor = conn.cursor()
-        cursor.execute(f"INSERT INTO questions (question_id, question, type, options, marks, answer) VALUES ('{self.question_id}','{self.question}', '{self.type}', '{self.options}', {self.marks}, '{self.answer}')")
+        cursor.execute(
+            "INSERT INTO question (id, quiz_id, question, type, options, marks, correct_answer) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (self.question_id, self.quiz_id, self.question, self.type, str(self.options), self.marks, self.answer)
+        )
+        conn.commit()
         cursor.close()
         conn.close()
     @staticmethod  
@@ -104,11 +110,19 @@ class Question:
             database="quiz_system"
         )
         cursor = conn.cursor()
-        cursor.execute(f"SELECT question, type, options, marks, correct_answer FROM question WHERE id = '{question_id}'")
+        cursor.execute(f"SELECT question, type, options, marks, correct_answer,quiz_id FROM question WHERE id = '{question_id}'")
         question = cursor.fetchone()
         cursor.close()
         conn.close()
-        return Question(question[0], question[1], question[2], question[3], question_id, question[4])
+        return Question(
+            question_id=question_id,
+            statement=question[0],
+            typ=question[1],
+            options=question[2],
+            marks=question[3],
+            answer=question[4],
+            quiz_id=question[5]
+        )
     
     def get_score(self, response):
         """
@@ -153,4 +167,25 @@ class Question:
             return self.marks * len(set(response_tokens).intersection(set(answer_tokens))) / len(set(response_tokens).union(set(answer_tokens))) 
         else:
             return 0
+    @staticmethod
+    def get_next_id():
+        """
+        Get the next available question ID.
+
+        Returns:
+        int: The next available question ID.
+        """
+        SQL_PASSWORD = os.getenv('SQL_PASSWORD')
+        conn = msc.connect(
+            host="localhost",
+            user="root",
+            password=SQL_PASSWORD,
+            database="quiz_system"
+        )
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(id) FROM question")
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return result[0] + 1 if result[0] else 1
 

@@ -5,8 +5,9 @@ from Models.Question import Question
 from UI.Components.Add_mcq_question import AddMCqQuestion
 from UI.Components.Add_short_answer_question import AddShortQuestion
 from UI.Components.Add_long_answer_question import AddLongQuestion
+from tkinter.messagebox import showinfo
 
-class AddQuestion(ctk.CTkToplevel):
+class AddQuiz(ctk.CTkToplevel):
     def __init__(self, teacher, **kwargs):
         super().__init__(**kwargs)
         self.teacher = teacher
@@ -17,32 +18,40 @@ class AddQuestion(ctk.CTkToplevel):
         self.top_frame = ctk.CTkFrame(self)
         self.top_frame.pack(pady=10, padx=10, fill="x")
 
-        # Left frame for quiz name
-        self.left_frame = ctk.CTkFrame(self.top_frame)
-        self.left_frame.pack(side="left", padx=10)
+        # Frame for quiz name
+        self.quiz_name_frame = ctk.CTkFrame(self.top_frame)
+        self.quiz_name_frame.pack(side="left", padx=10)
 
-        self.quiz_name_label = ctk.CTkLabel(self.left_frame, text="Quiz Name:", font=("Arial", 16))
+        self.quiz_name_label = ctk.CTkLabel(self.quiz_name_frame, text="Quiz Name:", font=("Arial", 16))
         self.quiz_name_label.pack(pady=5)
-        self.quiz_name_entry = ctk.CTkEntry(self.left_frame, width=200, font=("Arial", 16))
+        self.quiz_name_entry = ctk.CTkEntry(self.quiz_name_frame, width=200, font=("Arial", 16))
         self.quiz_name_entry.pack(pady=5)
 
-        # Right frame for other inputs
-        self.right_frame = ctk.CTkFrame(self.top_frame)
-        self.right_frame.pack(side="right", padx=10,ipadx=20)
+        # Frame for number of attempts
+        self.no_of_attempts_frame = ctk.CTkFrame(self.top_frame)
+        self.no_of_attempts_frame.pack(side="left", padx=10)
 
-        self.no_of_attempts_label = ctk.CTkLabel(self.right_frame, text="No of Attempts:")
+        self.no_of_attempts_label = ctk.CTkLabel(self.no_of_attempts_frame, text="No of Attempts:")
         self.no_of_attempts_label.pack(pady=5)
-        self.no_of_attempts_entry = ctk.CTkEntry(self.right_frame)
+        self.no_of_attempts_entry = ctk.CTkEntry(self.no_of_attempts_frame)
         self.no_of_attempts_entry.pack(pady=5)
 
-        self.assigned_to_batch_label = ctk.CTkLabel(self.right_frame, text="Assigned to Batch:")
+        # Frame for assigned to batch
+        self.assigned_to_batch_frame = ctk.CTkFrame(self.top_frame)
+        self.assigned_to_batch_frame.pack(side="left", padx=10)
+
+        self.assigned_to_batch_label = ctk.CTkLabel(self.assigned_to_batch_frame, text="Assigned to Batch:")
         self.assigned_to_batch_label.pack(pady=5)
-        self.assigned_to_batch_entry = ctk.CTkEntry(self.right_frame)
+        self.assigned_to_batch_entry = ctk.CTkEntry(self.assigned_to_batch_frame)
         self.assigned_to_batch_entry.pack(pady=5)
 
-        self.assigned_to_semester_label = ctk.CTkLabel(self.right_frame, text="Assigned to Semester:")
+        # Frame for assigned to semester
+        self.assigned_to_semester_frame = ctk.CTkFrame(self.top_frame)
+        self.assigned_to_semester_frame.pack(side="left", padx=10)
+
+        self.assigned_to_semester_label = ctk.CTkLabel(self.assigned_to_semester_frame, text="Assigned to Semester:")
         self.assigned_to_semester_label.pack(pady=5)
-        self.assigned_to_semester_entry = ctk.CTkEntry(self.right_frame)
+        self.assigned_to_semester_entry = ctk.CTkEntry(self.assigned_to_semester_frame)
         self.assigned_to_semester_entry.pack(pady=5)
 
         # Frame for questions
@@ -96,25 +105,28 @@ class AddQuestion(ctk.CTkToplevel):
                 questions.append(widget.get_question())
 
         quiz = Quiz(
-            made_by=self.teacher.name,
+            made_by=self.teacher.id,
             assigned_to_batch=assigned_to_batch,
             assigned_to_semester=assigned_to_semester,
             no_of_questions=len(questions),
             total_marks=None,  # This will be calculated
             questions=questions,
-            last_date=None,  # This should be set appropriately
             number_of_attempts=int(no_of_attempts),
             quiz_id=None,  # This should be set appropriately
             name=quiz_name
         )
+        
+        # saving the quiz to the database
+        quiz.to_sql()    
 
-        print(quiz)
-        return quiz
+        # show a success message and close the window
+        showinfo("Success", "Quiz added successfully")
+        self.destroy()
 
 if __name__ == "__main__":
     Teacher = Teacher.get_teacher_by_username("johnson")
     root = ctk.CTk()
-    app = AddQuestion(teacher=Teacher, master=root)
+    app = AddQuiz(teacher=Teacher, master=root)
     app.mainloop()
     root.destroy()
     

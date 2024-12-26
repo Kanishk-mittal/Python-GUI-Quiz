@@ -26,7 +26,6 @@ class AddShortQuestion(ctk.CTkFrame):
 
     def get_question(self):
         q= Question(statement=self.question_text.get("1.0", "end-1c"), answer=self.correct_answer_entry.get(), quiz_id=self.quiz_id,typ="Short Answer",marks=self.marks_entry.get())
-        print(q)
         return q
 if __name__ == "__main__":
     root = ctk.CTk()

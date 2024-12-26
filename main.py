@@ -52,7 +52,7 @@ def register(window,root):
         root = ctk.CTk()
         register = Register(root,is_student=False)
 
-if __name__ == '__main__':
+def main():
     # first check weather the database quiz_system exist or not
     # if not then create the database
     conn=msc.connect(host="localhost",user="root",password=os.getenv("SQL_PASSWORD"))
@@ -67,3 +67,6 @@ if __name__ == '__main__':
     root.geometry("400x400")
     login_window=Login(master=root,login_action=lambda: login_action(login_window,root),register_action=lambda: register(login_window,root))
     login_window.mainloop()
+
+if __name__ == "__main__":
+    main()

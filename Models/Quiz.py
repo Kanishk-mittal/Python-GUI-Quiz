@@ -7,15 +7,21 @@ from datetime import datetime
 from Models.Question import Question
 
 class Quiz:
-    def __init__(self, made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id, name):
+    def __init__(self, made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, number_of_attempts, quiz_id, name,questions=None):
         self.made_by = made_by
         self.assigned_to_batch = assigned_to_batch
         self.assigned_to_semester = assigned_to_semester
-        self.no_of_questions = no_of_questions
+        self.no_of_questions = len(questions)
         self.number_of_attempts = number_of_attempts
-        self.quiz_id = quiz_id
+        if quiz_id:
+            self.quiz_id = quiz_id
+        else:
+            self.quiz_id = Quiz.get_next_id()
         self.name = name 
-        self.questions = self.load_questions()
+        if questions:
+            self.questions = questions
+        else:
+            self.questions = self.load_questions()
         self.total_marks = self.calculate_total_marks()
     def load_questions(self):
         SQL_PASSWORD = os.getenv("SQL_PASSWORD")
@@ -33,7 +39,7 @@ class Quiz:
     def calculate_total_marks(self):
         total_marks = 0
         for question in self.questions:
-            total_marks += question.marks
+            total_marks += int(question.marks)
         return total_marks
     def attempts_left(self, student_id):
         SQL_PASSWORD = os.getenv("SQL_PASSWORD")
@@ -67,12 +73,23 @@ class Quiz:
         conn.close()
 
         return quizzes
+    def to_sql(self):
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost',
+                            user='root',
+                            password=SQL_PASSWORD,
+                            database='quiz_system') 
+        cursor = conn.cursor()
+        cursor.execute(f"INSERT INTO quiz (id, name, teacher_id, batch_id, semester, no_of_questions, attempts_allowed) VALUES ({self.quiz_id}, '{self.name}', {self.made_by}, '{self.assigned_to_batch}', '{self.assigned_to_semester}', {self.no_of_questions}, {self.number_of_attempts})")
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     @staticmethod
     def from_sql(quiz_id):
         SQL_PASSWORD = os.getenv("SQL_PASSWORD")
         conn = msc.connect(host='localhost', user='root', password=SQL_PASSWORD, database='quiz_system')
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
         # Load quiz and teacher data using join
         cursor.execute(f"""
@@ -91,14 +108,23 @@ class Quiz:
         no_of_questions = int(quiz_data['no_of_questions'])
         total_marks = None  # This will be calculated
         questions = []  # This should be loaded from another source
-        last_date = datetime.strptime(quiz_data['last_date'], '%Y-%m-%d')
         number_of_attempts = int(quiz_data['attempts_allowed'])
         name = quiz_data['name']
 
         cursor.close()
         conn.close()
 
-        return Quiz(made_by, assigned_to_batch, assigned_to_semester, no_of_questions, total_marks, questions, last_date, number_of_attempts, quiz_id, name)
+        return Quiz(
+            made_by=made_by,
+            assigned_to_batch=assigned_to_batch,
+            assigned_to_semester=assigned_to_semester,
+            no_of_questions=no_of_questions,
+            total_marks=total_marks,
+            number_of_attempts=number_of_attempts,
+            quiz_id=quiz_id,
+            name=name,
+            questions=questions
+        )
     @staticmethod
     def get_next_id():
         SQL_PASSWORD = os.getenv("SQL_PASSWORD")
