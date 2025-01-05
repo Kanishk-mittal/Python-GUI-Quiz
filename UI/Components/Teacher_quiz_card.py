@@ -57,7 +57,11 @@ class TeacherQuizCard(ctk.CTkFrame):
             self.destroy()
 
     def rename(self):
-        print("Rename quiz")
+        new_name = ctk.CTkInputDialog(title="Rename quiz", text="Enter new name for the quiz").get_input()
+        if new_name:
+            self.quiz.name = new_name
+            self.quiz.update_name(new_name)
+            self.quiz_name_label.configure(text=new_name)
     
     def send_report(self):
         print("Send report")

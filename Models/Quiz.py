@@ -84,6 +84,18 @@ class Quiz:
         conn.commit()
         cursor.close()
         conn.close()
+    def update_name(self, new_name):
+        SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+        conn = msc.connect(host='localhost',
+                            user='root',
+                            password=SQL_PASSWORD,
+                            database='quiz_system')
+        cursor = conn.cursor()
+        cursor.execute(f"UPDATE quiz SET name = '{new_name}' WHERE id = {self.quiz_id}")
+        conn.commit()
+        cursor.close()
+        conn.close()
+        self.name = new_name
 
     @staticmethod
     def from_sql(quiz_id):
