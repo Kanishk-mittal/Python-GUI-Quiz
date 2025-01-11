@@ -25,7 +25,7 @@ class StudentDashboard(ctk.CTkToplevel):
         self.logout_button = ctk.CTkButton(self, text="Logout", command=self.logout)
         self.logout_button.pack(padx=10, pady=5)
         
-        self.get_report_button = ctk.CTkButton(self, text="Get Report", command=self.get_report)
+        self.get_report_button = ctk.CTkButton(self, text="Get Report", command=self.show_report)
         self.get_report_button.pack(padx=10, pady=5)
         
         # at the right side of the welcome message, we will display the pie chart which we will get using student.get_pie()
@@ -41,21 +41,20 @@ class StudentDashboard(ctk.CTkToplevel):
         # Third part: Display the list of quizzes that the student can attempt
         self.quiz_list_label = ctk.CTkLabel(self, text="Quizzes")
         self.quiz_list_label.pack(padx=10, pady=10)
-        self.quiz_list = ctk.CTkFrame(self)
+        self.quiz_list = ctk.CTkScrollableFrame(self, width=self.winfo_screenwidth()*0.7, height=self.winfo_screenheight()*0.6)
         self.quiz_list.pack(padx=10, pady=10)
         
         # We will create a StudentQuizCard for each quiz in the student.get_quizzes()
         for quiz in self.student.load_quizzes():
-            quiz_card = StudentQuizCard(self.quiz_list, quiz)
+            quiz_card = StudentQuizCard(self.quiz_list, quiz,self.student)
             quiz_card.pack(padx=10, pady=10)
     
     def logout(self):
-        # Implement the logout functionality here
-        pass
+        quit()
     
-    def get_report(self):
-        # this show that a report is sent via email
-        showinfo("Message sent", "Report has been sent to your email")  
+    def show_report(self):
+        # TODO: This function will send a pdf of average performance of the student to the student's email
+        pass
 
 if __name__ == "__main__":
     import tkinter as tk

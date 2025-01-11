@@ -144,7 +144,7 @@ class Question:
         (number of common words / total unique words) * marks
         """
         if self.type == 'MCQ':
-            if response == self.options[self.answer] or response == self.answer:
+            if response == self.answer:
                 return self.marks
             else:
                 return 0
@@ -188,4 +188,3 @@ class Question:
         cursor.close()
         conn.close()
         return result[0] + 1 if result[0] else 1
-

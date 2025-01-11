@@ -48,7 +48,7 @@ class TeacherQuizCard(ctk.CTkFrame):
         self.attempt_button = ctk.CTkButton(self.buttons_frame, text="Rename", command=self.rename)
         self.attempt_button.pack(side="left", padx=5, pady=5)
 
-        self.attempt_button = ctk.CTkButton(self.buttons_frame, text="Get report", command=self.send_report)
+        self.attempt_button = ctk.CTkButton(self.buttons_frame, text="Get report", command=self.show_report)
         self.attempt_button.pack(side="left", padx=5, pady=5)
 
     def remove_quiz(self):
@@ -63,7 +63,8 @@ class TeacherQuizCard(ctk.CTkFrame):
             self.quiz.update_name(new_name)
             self.quiz_name_label.configure(text=new_name)
     
-    def send_report(self):
+    def show_report(self):
+        #TODO: Create a window to show the report
         print("Send report")
 
 if __name__ == "__main__":

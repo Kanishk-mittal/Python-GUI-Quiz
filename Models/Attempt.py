@@ -124,7 +124,7 @@ class Attempt:
         attempt = cursor.fetchone()
         cursor.close()
         conn.close()
-        return Attempt(student_roll_no=attempt[0], quiz_id=attempt[1], answers=attempt[2], marks_obtained=attempt[3], time_stamp=attempt[4], id=attempt_id)
+        return Attempt(student_roll_no=attempt[0], quiz_id=attempt[1], answers=attempt[2], time_stamp=attempt[4], id=attempt_id)
 
     def get_score(self):
         """
@@ -141,8 +141,8 @@ class Attempt:
         total_marks = quiz.total_marks
         questions = quiz.questions
         score = 0
-        for i in range(len(questions)):
-            score += questions[i].get_score(self.answers[i])
+        for key,value in self.answers.items():
+            score+=Question.from_sql(key).get_score(value)
         return score
 
     @staticmethod
