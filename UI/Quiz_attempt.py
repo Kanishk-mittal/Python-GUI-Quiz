@@ -6,6 +6,7 @@ from Models.Quiz import Quiz
 from Models.Attempt import Attempt  
 from Models.Student import student
 from datetime import datetime
+from tkinter.messagebox import showinfo
 
 class QuizAttempt(ctk.CTkToplevel):
     def __init__(self, master, student, quiz):
@@ -49,11 +50,15 @@ class QuizAttempt(ctk.CTkToplevel):
         self.submit_button.pack(pady=20)
 
     def submit(self):
-        answers = []
+        answers = dict()
         for question_widget in self.questions_frame.winfo_children():
-            answers.append(question_widget.get_answer())
-        attempt=Attempt(student.roll_no,quiz.quiz_id,answers,datetime.now())
+            question_id, answer = question_widget.get_answer()
+            answers[question_id] = answer
+        attempt=Attempt(self.student.roll_no,self.quiz.quiz_id,answers,datetime.now())
         attempt.to_sql()
+        showinfo("Success", "Quiz submitted successfully")
+        self.destroy()
+
 
 if __name__ == "__main__":
     from Models.Question import Question

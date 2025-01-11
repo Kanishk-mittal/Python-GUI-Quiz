@@ -28,7 +28,7 @@ class ShortAnswerQuestion(ctk.CTkFrame):
         self.answer_entry.grid(row=1, column=0, padx=10, pady=10)
     
     def get_answer(self):
-        return self.answer_entry.get()
+        return (self.question.question_id,self.answer_entry.get())
 
 if __name__ == '__main__':
     question = "What is the capital of India?"

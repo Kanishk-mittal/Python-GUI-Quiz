@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from Models.Quiz import Quiz
 from UI.Student_quiz_review import StudentQuizReview
+from UI.Quiz_attempt import QuizAttempt
 
 class StudentQuizCard(ctk.CTkFrame):
     """
@@ -50,8 +51,7 @@ class StudentQuizCard(ctk.CTkFrame):
         StudentQuizReview(self.master, self.student, self.quiz).mainloop()
 
     def attempt_quiz(self):
-    # Implement the attempt quiz functionality
-        pass
+        QuizAttempt(self.master, self.student, self.quiz).mainloop()
 
 if __name__ == '__main__':
     quiz = Quiz(

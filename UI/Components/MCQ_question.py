@@ -33,4 +33,4 @@ class McqQuestion(ctk.CTkFrame):
             i+=1
     
     def get_answer(self):
-        return self.question.options[self.selected_option.get()]
+        return (self.question.question_id,self.selected_option.get())

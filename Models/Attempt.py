@@ -4,6 +4,7 @@ from .Quiz import Quiz
 from .Question import Question
 import mysql.connector as msc
 import matplotlib.pyplot as plt
+import json
 
 class Attempt:
     """
@@ -63,7 +64,7 @@ class Attempt:
             self.id = Attempt.get_next_id()
         self.student_roll_no = student_roll_no
         self.quiz_id = quiz_id
-        self.answers = eval(answers)
+        self.answers = dict(answers)
         if marks_obtained is None:
             self.marks_obtained = self.get_score()
         else:
@@ -95,7 +96,9 @@ class Attempt:
             database="quiz_system"
         )
         cursor = conn.cursor()
-        cursor.execute(f"INSERT INTO attempts (id, student_roll_no, quiz_id, answers, marks_obtained, time_stamp) VALUES ('{self.id}','{self.student_roll_no}', '{self.quiz_id}', '{self.answers}', {self.marks_obtained}, '{self.time_stamp}')")
+        answers_json = json.dumps(self.answers)
+        cursor.execute(f"INSERT INTO attempt (id, student_roll_no, quiz_id, answers, marks_obtained, time_stamp) VALUES ('{self.id}','{self.student_roll_no}', '{self.quiz_id}', '{answers_json}', {self.marks_obtained}, '{self.time_stamp}')")
+        conn.commit()
         cursor.close()
         conn.close()
     @staticmethod
@@ -124,7 +127,7 @@ class Attempt:
         attempt = cursor.fetchone()
         cursor.close()
         conn.close()
-        return Attempt(student_roll_no=attempt[0], quiz_id=attempt[1], answers=attempt[2], time_stamp=attempt[4], id=attempt_id)
+        return Attempt(student_roll_no=attempt[0], quiz_id=attempt[1], answers=eval(attempt[2]), time_stamp=attempt[4], id=attempt_id)
 
     def get_score(self):
         """

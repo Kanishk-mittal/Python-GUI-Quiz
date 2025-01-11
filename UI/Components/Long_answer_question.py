@@ -28,7 +28,7 @@ class LongAnswerQuestion(ctk.CTkFrame):
         self.answer_text.grid(row=1, column=0, padx=10, pady=10)
     
     def get_answer(self):
-        return self.answer_text.get("1.0", "end-1c")
+        return (self.question.question_id, self.answer_text.get("1.0", "end-1c"))
 
 if __name__ == '__main__':
     question = "Describe the process of photosynthesis."
